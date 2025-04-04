@@ -137,4 +137,39 @@ class TestAccountService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
 
+    # Test 2 List Of Accounts
+
+    def test_get_account(self):
+        """ This should get a list of Accounts """ 
+        self._create_accounts(5)
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+    
+    # Test 3 Update the existing Acccounts
+    def test_update_account(self):
+        test_account = AccountFactory()
+        resp = self.client.post(BASE_URL, json=test_account.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Update the extisting Account
+        new_account = resp.get_json()
+        new_account["name"] = "Something Known"
+        resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        update_account = resp.get_json()
+        self.assertEqual(update_account["name"], "Something Known")
+
+    # Delete An account Test 4
+    def test_delete_account(self):
+        """ It should Delete an Account"""
+        account = self._create_accounts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    # Check the method
+    def test_method_not_allowed(self):
+        """ This should not allow a wrong method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
     
