@@ -5,6 +5,11 @@
 
 This repository contains the starter code for the project in [**IBM-CD0285EN-SkillsNetwork DevOps Capstone Project**](https://www.coursera.org/learn/devops-capstone-project?specialization=devops-and-software-engineering) which is part of the [**IBM DevOps and Software Engineering Professional Certificate**](https://www.coursera.org/professional-certificates/devops-and-software-engineering)
 
+## Badge
+![CI Build](https://github.com/RafailBesparas/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.9-blue)
+![License](https://img.shields.io/github/license/RafailBesparas/devops-capstone-project)
+
 ## Usage
 
 You should use this template to start your DevOps Capstone project. It contains all of the code that you will need to get started.
