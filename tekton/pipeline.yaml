@@ -30,9 +30,32 @@ spec:
       taskRef:
         name: git-clone
       params:
-      - name: url
-        value: $(params.repo-url)
-      - name: revision
-        value: $(params.branch)
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.branch)
       runAfter:
         - init
+
+    - name: lint
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+      taskSpec:
+        workspaces:
+          - name: source
+        steps:
+          - name: flake8
+            image: python:3.9-slim
+            script: |
+              #!/bin/sh
+              pip install flake8
+              cd /workspace/source
+              echo "Running flake8 linting..."
+              flake8 service tests \
+                --count \
+                --max-complexity=10 \
+                --max-line-length=127 \
+                --statistics || echo "⚠️ flake8 failed but continuing pipeline"
+      runAfter:
+        - clone
