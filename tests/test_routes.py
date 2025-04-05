@@ -41,9 +41,8 @@ class TestAccountService(TestCase):
 
     def setUp(self):
         """Runs before each test"""
-        db.session.query(Account).delete()  # clean up the last tests
+        db.session.query(Account).delete()
         db.session.commit()
-
         self.client = app.test_client()
 
     def tearDown(self):
@@ -53,7 +52,6 @@ class TestAccountService(TestCase):
     ######################################################################
     #  H E L P E R   M E T H O D S
     ######################################################################
-
     def _create_accounts(self, count):
         """Factory method to create accounts in bulk"""
         accounts = []
@@ -73,7 +71,6 @@ class TestAccountService(TestCase):
     ######################################################################
     #  A C C O U N T   T E S T   C A S E S
     ######################################################################
-
     def test_index(self):
         """It should get 200_OK from the Home Page"""
         response = self.client.get("/")
@@ -95,12 +92,8 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # Make sure location header is set
         location = response.headers.get("Location", None)
         self.assertIsNotNone(location)
-
-        # Check the data is correct
         new_account = response.get_json()
         self.assertEqual(new_account["name"], account.name)
         self.assertEqual(new_account["email"], account.email)
@@ -123,53 +116,42 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    # ADD YOUR TEST CASES HERE ...
-
-    # Test Case 1 Rafael Besparas 1 
-
-    def test_get_account(self):
-        """ This should read a Single Account """
+    def test_read_single_account(self):
+        """It should Read a Single Account"""
         account = self._create_accounts(1)[0]
         resp = self.client.get(
-            f"{BASE_URL}/{account.id}", content_type = "application/json"
+            f"{BASE_URL}/{account.id}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
 
-    # Test 2 List Of Accounts
-
-    def test_get_account(self):
-        """ This should get a list of Accounts """ 
+    def test_list_accounts(self):
+        """It should get a list of Accounts"""
         self._create_accounts(5)
         resp = self.client.get(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
-    
-    # Test 3 Update the existing Acccounts
+
     def test_update_account(self):
+        """It should Update an existing Account"""
         test_account = AccountFactory()
         resp = self.client.post(BASE_URL, json=test_account.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-
-        # Update the extisting Account
         new_account = resp.get_json()
         new_account["name"] = "Something Known"
         resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
         update_account = resp.get_json()
         self.assertEqual(update_account["name"], "Something Known")
 
-    # Delete An account Test 4
     def test_delete_account(self):
-        """ It should Delete an Account"""
+        """It should Delete an Account"""
         account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-    # Check the method
     def test_method_not_allowed(self):
-        """ This should not allow a wrong method call"""
+        """It should not allow a wrong method call"""
         resp = self.client.delete(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-    
